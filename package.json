@@ -9,10 +9,8 @@
     "server": "node server/index.js",
     "client": "vite --host",
     "build": "vite build",
-    "build:production": "NODE_ENV=production vite build",
     "preview": "vite preview",
-    "start": "npm run build && npm run server",
-    "vercel-build": "npm run build:production"
+    "start": "npm run build && npm run server"
   },
   "keywords": [
     "claude",
