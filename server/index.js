@@ -231,13 +231,13 @@ app.get('/api/projects/:projectName/sessions/:sessionId/messages', authenticateT
     try {
         const { projectName, sessionId } = req.params;
         const { limit, offset } = req.query;
-        
+
         // Parse limit and offset if provided
         const parsedLimit = limit ? parseInt(limit, 10) : null;
         const parsedOffset = offset ? parseInt(offset, 10) : 0;
-        
+
         const result = await getSessionMessages(projectName, sessionId, parsedLimit, parsedOffset);
-        
+
         // Handle both old and new response formats
         if (Array.isArray(result)) {
             // Backward compatibility: no pagination parameters were provided
@@ -507,7 +507,7 @@ function handleChatConnection(ws) {
             } else if (data.type === 'abort-session') {
                 console.log('🛑 Abort session request:', data.sessionId);
                 const provider = data.provider || 'claude';
-                const success = provider === 'cursor' 
+                const success = provider === 'cursor'
                     ? abortCursorSession(data.sessionId)
                     : abortClaudeSession(data.sessionId);
                 ws.send(JSON.stringify({
@@ -994,13 +994,16 @@ app.post('/api/projects/:projectName/upload-images', authenticateToken, async (r
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {
-  if (process.env.NODE_ENV === 'production') {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
-  } else {
-    // In development, redirect to Vite dev server
-    res.redirect(`http://localhost:${process.env.VITE_PORT || 3001}`);
-  }
+    if (process.env.NODE_ENV === 'production') {
+        res.sendFile(path.join(__dirname, '../dist/index.html'));
+    } else {
+        // In development, redirect to Vite dev server
+        res.redirect(`http://localhost:${process.env.VITE_PORT || 3001}`);
+    }
 });
+
+// Export the Express app for Vercel
+export default app;
 
 // Helper function to convert permissions to rwx format
 function permToRwx(perm) {
@@ -1096,7 +1099,7 @@ async function startServer() {
             console.log(`Claude Code UI server running on http://0.0.0.0:${PORT}`);
 
             // Start watching the projects folder for changes
-            await setupProjectsWatcher(); 
+            await setupProjectsWatcher();
         });
     } catch (error) {
         console.error('❌ Failed to start server:', error);
@@ -1104,4 +1107,7 @@ async function startServer() {
     }
 }
 
-startServer();
+// Only start server if not in Vercel environment
+if (process.env.VERCEL !== '1') {
+    startServer();
+}
